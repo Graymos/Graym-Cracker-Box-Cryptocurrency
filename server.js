@@ -1,3 +1,5 @@
+/* Express server setup for Graym Cracker Box - Handles API endpoints and blockchain interactions */
+/* Note: Used AI assistance for the API endpoint structure and error handling*/
 import express from 'express';
 import cors from 'cors';
 import objHippoChain from './index.js';
@@ -5,10 +7,12 @@ import objHippoChain from './index.js';
 const app = express();
 const port = 3000;
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
+/* AI-assisted API endpoint implementation */
 // Get the entire blockchain
 app.get('/api/chain', async (req, res) => {
     try {
@@ -23,7 +27,7 @@ app.get('/api/chain', async (req, res) => {
 // Mine a new block
 app.post('/api/mine', async (req, res) => {
     const { amount, sender, recipient } = req.body;
-    
+
     if (!amount || !sender || !recipient) {
         return res.status(400).json({ 
             error: 'Missing required fields',
@@ -52,6 +56,7 @@ app.post('/api/mine', async (req, res) => {
     }
 });
 
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
@@ -60,6 +65,7 @@ app.use((err, req, res, next) => {
         message: err.message
     });
 });
+
 
 app.listen(port, () => {
     console.log(`Blockchain server running at http://localhost:${port}`);
