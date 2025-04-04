@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graym Cracker Box</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #8B4513;  /* Saddle Brown */
+            --secondary-color: #D2B48C;  /* Tan */
+            --accent-color: #CD853F;  /* Peru */
+            --light-color: #F5DEB3;  /* Wheat */
+            --dark-color: #654321;  /* Dark Brown */
+        }
+
+        body {
+            background-color: var(--light-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNENkI0OEMiIGZpbGwtb3BhY2l0eT0iMC4yIj48cGF0aCBkPSJNMCAwaDQwdjQwSDB6Ii8+PC9nPjwvZz48L3N2Zz4=');
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--light-color) !important;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: var(--light-color);
+            border: 1px solid var(--secondary-color);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .block-card {
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .block-card.genesis {
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .block-card.latest {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .hash-text {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: var(--dark-color);
+            word-break: break-all;
+        }
+
+        .transaction-details {
+            background-color: var(--secondary-color);
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            color: var(--dark-color);
+        }
+
+        .mining-form {
+            background: var(--light-color);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid var(--secondary-color);
+        }
+
+        .form-control {
+            background-color: white;
+            border: 1px solid var(--secondary-color);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--dark-color);
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .connection-status.show {
+            opacity: 1;
+        }
+
+        .connection-status.connected {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+        }
+
+        .connection-status.disconnected {
+            background-color: #8B0000;
+            color: var(--light-color);
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .error-message {
+            color: #8B0000;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .blockchain-stats {
+            background: var(--light-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid var(--secondary-color);
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .badge {
+            background-color: var(--primary-color);
+        }
+
+        .badge.bg-primary {
+            background-color: var(--secondary-color) !important;
+        }
+
+        .badge.bg-success {
+            background-color: var(--primary-color) !important;
+        }
+
+        .badge.bg-danger {
+            background-color: var(--accent-color) !important;
+        }
+
+        .input-group-text {
+            background-color: var(--secondary-color);
+            border: 1px solid var(--secondary-color);
+            color: var(--dark-color);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-cookie me-2"></i>Graym Cracker Box
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Connection Status -->
+        <div class="connection-status disconnected" id="connectionStatus">
+            <i class="fas fa-plug me-2"></i>Disconnected
+        </div>
+
+        <!-- Blockchain Stats -->
+        <div class="blockchain-stats">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalBlocks">0</div>
+                        <div class="stat-label">Total Crackers</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalTransactions">0</div>
+                        <div class="stat-label">Total Cracker Trades</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalAmount">0</div>
+                        <div class="stat-label">Total Cracker Value</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mining Form -->
+        <div class="mining-form p-4 mb-5">
+            <h4 class="mb-4"><i class="fas fa-cookie-bite me-2"></i>Bake New Cracker</h4>
+            <form id="mineForm" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Amount</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-cookie"></i></span>
+                        <input type="number" class="form-control" name="amount" required min="0.01" step="0.01">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Sender</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" name="sender" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Recipient</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" name="recipient" required>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-cookie-bite me-2"></i>Bake Cracker
+                    </button>
+                    <div id="errorMessage" class="error-message"></div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Blockchain Display -->
+        <h4 class="mb-4"><i class="fas fa-boxes me-2"></i>Cracker Chain</h4>
+        <div id="blockchain" class="row g-4">
+            <!-- Blocks will be inserted here -->
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+        let isConnected = false;
+
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connectionStatus');
+            const wasConnected = isConnected;
+            isConnected = connected;
+
+            // Only show status if there's a change
+            if (wasConnected !== connected) {
+                statusElement.className = `connection-status ${connected ? 'connected' : 'disconnected'} show`;
+                statusElement.innerHTML = `<i class="fas fa-${connected ? 'check' : 'times'} me-2"></i>${connected ? 'Connected' : 'Disconnected'}`;
+                
+                // Hide the status after 3 seconds
+                setTimeout(() => {
+                    statusElement.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Update blockchain stats
+        function updateStats(chain) {
+            const totalBlocks = chain.length;
+            const totalTransactions = chain.filter(block => block.transaction && block.transaction.decTransAmt).length;
+            const totalAmount = chain.reduce((sum, block) => 
+                sum + (block.transaction && block.transaction.decTransAmt ? block.transaction.decTransAmt : 0), 0);
+
+            document.getElementById('totalBlocks').textContent = totalBlocks;
+            document.getElementById('totalTransactions').textContent = totalTransactions;
+            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+        }
+
+        // Check server connection
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_URL}/api/chain`);
+                updateConnectionStatus(response.ok);
+                return response.ok;
+            } catch (error) {
+                updateConnectionStatus(false);
+                return false;
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        // Fetch and display the blockchain
+        async function fetchBlockchain() {
+            try {
+                if (!await checkConnection()) {
+                    throw new Error('Cannot connect to server. Please make sure the server is running.');
+                }
+
+                const response = await fetch(`${API_URL}/api/chain`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch blockchain');
+                }
+                const chain = await response.json();
+                displayBlockchain(chain);
+                updateStats(chain);
+            } catch (error) {
+                console.error('Error fetching blockchain:', error);
+                showToast(error.message, 'danger');
+            }
+        }
+
+        // Display the blockchain
+        function displayBlockchain(chain) {
+            const blockchainDiv = document.getElementById('blockchain');
+            const currentBlocks = blockchainDiv.querySelectorAll('.block-card');
+            const currentBlockHashes = Array.from(currentBlocks).map(block => 
+                block.querySelector('.hash-text').textContent
+            );
+
+            blockchainDiv.innerHTML = chain.map((block, index) => {
+                const isNewBlock = !currentBlockHashes.includes(block.hash);
+                return `
+                <div class="col-md-6 col-lg-4 ${isNewBlock ? 'fade-in' : ''}">
+                    <div class="card block-card h-100 ${index === 0 ? 'genesis' : ''} ${index === chain.length - 1 ? 'latest' : ''}">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span class="badge bg-${index === 0 ? 'danger' : index === chain.length - 1 ? 'success' : 'primary'}">
+                                ${index === 0 ? 'Genesis' : index === chain.length - 1 ? 'Latest' : `Block #${block.index}`}
+                            </span>
+                            <small class="text-muted">
+                                ${new Date(block.time).toLocaleString()}
+                            </small>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">Hash</h6>
+                            <p class="card-text hash-text">${block.hash}</p>
+                            <h6 class="card-subtitle mb-2 text-muted">Previous Hash</h6>
+                            <p class="card-text hash-text">${block.previousHash}</p>
+                            <h6 class="card-subtitle mb-2 text-muted">Nonce</h6>
+                            <p class="card-text">${block.nonce}</p>
+                            ${block.transaction && block.transaction.decTransAmt ? `
+                                <div class="transaction-details">
+                                    <h6 class="card-subtitle mb-2 text-muted">Transaction</h6>
+                                    <p class="card-text">
+                                        <strong>Amount:</strong> ${block.transaction.decTransAmt}<br>
+                                        <strong>From:</strong> ${block.transaction.strTransSender}<br>
+                                        <strong>To:</strong> ${block.transaction.strTransRecipient}
+                                    </p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        // Handle mining form submission
+        document.getElementById('mineForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const errorMessage = document.getElementById('errorMessage');
+            form.classList.add('loading');
+            errorMessage.style.display = 'none';
+
+            if (!isConnected) {
+                showToast('Cannot connect to server. Please make sure the server is running.', 'danger');
+                form.classList.remove('loading');
+                return;
+            }
+
+            const formData = new FormData(form);
+            const data = {
+                amount: Number(formData.get('amount')),
+                sender: formData.get('sender'),
+                recipient: formData.get('recipient')
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/api/mine`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to mine block');
+                }
+
+                form.reset();
+                showToast('Block mined successfully!');
+                await fetchBlockchain();
+            } catch (error) {
+                console.error('Error mining block:', error);
+                errorMessage.textContent = error.message;
+                errorMessage.style.display = 'block';
+                showToast(error.message, 'danger');
+            } finally {
+                form.classList.remove('loading');
+            }
+        });
+
+        // Initial load and connection check
+        checkConnection();
+        fetchBlockchain();
+        
+        // Refresh connection status and blockchain every 5 seconds
+        setInterval(checkConnection, 5000);
+        setInterval(fetchBlockchain, 10000);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
