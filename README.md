@@ -20,8 +20,8 @@ A deliciously themed blockchain implementation that turns the complex world of c
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd crypto
+git clone https://github.com/Graymos/Graym-Cracker-Box-Cryptocurrency.git
+cd Graym-Cracker-Box-Cryptocurrency
 ```
 
 2. Install dependencies:
